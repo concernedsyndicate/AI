@@ -19,6 +19,8 @@ func _process(delta):
 	#velocity += flee(target.position)
 	velocity += arrive(target.position, 2)
 	position += velocity * delta
+	#rotation = velocity.angle()
+	$Sprite.rotation = velocity.angle() -36 # oszukanko xD
 	
 
 func seek(tPosition):
@@ -55,9 +57,36 @@ func arrive(tPosition, deceleration):
 		return (desiredVelocity - velocity)
 	return Vector2(0,0)
 
+##func Pursuit():
+#if the evader is ahead and facing the agent then we can just seek
+#for the evader's current position.
+	# nasze toTarget: Vector2D ToEvader = evader->Pos() - m_pVehicle->Pos()
+	##var RelativeHeading = m_pVehicle->Heading().dot(evader->Heading())
+	##if ((ToEvader.Dot(m_pVehicle->Heading()) > 0) && (RelativeHeading < -0.95)): #acos(0.95)=18 degs
+	##	return Seek(evader->Pos())
+	#Not considered ahead so we predict where the evader will be.
+	#the look-ahead time is proportional to the distance between the evader
+	#and the pursuer; and is inversely proportional to the sum of the
+	#agents' velocities
+	##var LookAheadTime = ToEvader.Length() / (m_pVehicle->MaxSpeed() + evader->Speed())
+	#now seek to the predicted future position of the evader
+	##return Seek(evader->Pos() + evader->Velocity() * LookAheadTime);
+
 func _draw():
-	draw_line(Vector2(0,0), Vector2(velocity), Color(255, 0, 0), 1)                      # red
-	draw_line(Vector2(0,0), Vector2(target.position-self.position), Color(0, 255, 0), 1) # green
+	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)                                # red
+	draw_vector(Vector2(0,0), Vector2(target.position-self.position), Color(0, 255, 0), 5)  # green
+	
+	
+func draw_vector( origin, vector, color, arrow_size ):
+	if vector.length_squared() > 1:
+		var points    = []
+		var direction = vector.normalized()
+		points.push_back( vector + direction * arrow_size * 2 )
+		points.push_back( vector + direction.rotated(  PI / 2 ) * arrow_size )
+		points.push_back( vector + direction.rotated( -PI / 2 ) * arrow_size )
+		draw_polygon( points, [color])
+		draw_line( origin, vector, color, arrow_size )
+	
 	
 func Vec2DistanceSq(one, two):
 	var ySep = two.y - one.y;

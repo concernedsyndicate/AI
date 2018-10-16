@@ -19,8 +19,10 @@ audio_bus_name = "Master"
 
 [node name="Sprite" type="Sprite" parent="." index="0"]
 
-rotation = 3.13143
+self_modulate = Color( 0.796875, 0.152527, 0.152527, 1 )
+rotation = 1.5708
 texture = ExtResource( 1 )
+_sections_unfolded = [ "Material", "Transform", "Visibility" ]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
 
