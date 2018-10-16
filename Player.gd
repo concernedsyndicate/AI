@@ -25,11 +25,9 @@ func get_input():
 		velocity = Vector2(speed, 0).rotated(rotation)
 
 func _process(delta):
-	
 	get_input()
 	rotation += rotation_dir * rotation_speed * delta
 	move_and_slide(velocity)
 
 func _draw():
 	draw_line(Vector2(0,0), heading, Color(255, 0, 0), 1)                       # red
-	

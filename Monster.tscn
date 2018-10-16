@@ -8,7 +8,6 @@ custom_solver_bias = 0.0
 radius = 30.0
 
 [node name="Monster" type="Area2D"]
-
 input_pickable = true
 gravity_vec = Vector2( 0, 1 )
 gravity = 98.0
@@ -17,16 +16,13 @@ angular_damp = 1.0
 audio_bus_override = false
 audio_bus_name = "Master"
 
-[node name="Sprite" type="Sprite" parent="." index="0"]
-
+[node name="Sprite" type="Sprite" parent="."]
 self_modulate = Color( 0.796875, 0.152527, 0.152527, 1 )
 rotation = 1.5708
 texture = ExtResource( 1 )
 _sections_unfolded = [ "Material", "Transform", "Visibility" ]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
-
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.56898
 shape = SubResource( 1 )
-
 

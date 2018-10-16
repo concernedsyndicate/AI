@@ -14,20 +14,20 @@ func _ready():
 
 func _process(delta):
 	update()
-	toTarget = target.position-self.position
+	toTarget = target.position - position
 	#velocity += seek(target.position)
 	#velocity += flee(target.position)
 	velocity += arrive(target.position, 2)
 	position += velocity * delta
 	#rotation = velocity.angle()
-	$Sprite.rotation = velocity.angle() -36 # oszukanko xD
+	rotation = velocity.angle()
 	
 
 func seek(tPosition):
 	#desiredVelocity = Vector2(tPosition - self.position).normalized() * maxSpeed
 	desiredVelocity = toTarget.normalized() * maxSpeed
 	
-	return (desiredVelocity - velocity)
+	return desiredVelocity - velocity
 
 func flee(tPosition): 
 	# only flee if the target is within 'panic distance'. Work in distance
@@ -73,8 +73,9 @@ func arrive(tPosition, deceleration):
 	##return Seek(evader->Pos() + evader->Velocity() * LookAheadTime);
 
 func _draw():
+	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
+	draw_vector(Vector2(0,0), target.position - position, Color(0, 255, 0), 5)  # green
 	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)                                # red
-	draw_vector(Vector2(0,0), target.position-self.position, Color(0, 255, 0), 5)  # green
 	
 	
 func draw_vector( origin, vector, color, arrow_size ):
