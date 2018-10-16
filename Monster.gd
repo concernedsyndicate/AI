@@ -36,7 +36,7 @@ func flee(tPosition):
 	if (Vec2DistanceSq(self.position, tPosition) > PanicDistanceSq):
 		return Vector2(0,0)
 	
-	desiredVelocity = Vector2(self.position - tPosition).normalized() * maxSpeed
+	desiredVelocity = (position - tPosition).normalized() * maxSpeed
 	
 	return (desiredVelocity - velocity)
 
@@ -74,7 +74,7 @@ func arrive(tPosition, deceleration):
 
 func _draw():
 	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)                                # red
-	draw_vector(Vector2(0,0), Vector2(target.position-self.position), Color(0, 255, 0), 5)  # green
+	draw_vector(Vector2(0,0), target.position-self.position, Color(0, 255, 0), 5)  # green
 	
 	
 func draw_vector( origin, vector, color, arrow_size ):
@@ -84,7 +84,7 @@ func draw_vector( origin, vector, color, arrow_size ):
 		points.push_back( vector + direction * arrow_size * 2 )
 		points.push_back( vector + direction.rotated(  PI / 2 ) * arrow_size )
 		points.push_back( vector + direction.rotated( -PI / 2 ) * arrow_size )
-		draw_polygon( points, [color])
+		draw_polygon( points, PoolColorArray([color]))
 		draw_line( origin, vector, color, arrow_size )
 	
 	
