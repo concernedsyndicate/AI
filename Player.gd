@@ -1,13 +1,12 @@
 extends KinematicBody2D
 
-export (int) var speed = 400
-export (float) var rotation_speed = 1.5
+export (int) var speed
+export (float) var rotation_speed
 
 var screensize          # Size of the game window.
 
 var velocity = Vector2()
 var rotation_dir = 0
-var heading = Vector2()
 
 func _ready():
 	 screensize = get_viewport_rect().size
@@ -30,4 +29,5 @@ func _process(delta):
 	move_and_slide(velocity)
 
 func _draw():
-	draw_line(Vector2(0,0), heading, Color(255, 0, 0), 1)                       # red
+	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(255, 0, 0), 1)                       # red
+	# dlaczego nie jest w stanie rysowac dla 'velocity' ?

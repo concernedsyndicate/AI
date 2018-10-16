@@ -2,30 +2,32 @@ extends Area2D
 
 var target
 var maxSpeed
-var velocity = Vector2(0,0) # current velocity
+var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now too
 var desiredVelocity
 var toTarget = Vector2(0,0)
+var toTargetHeading = Vector2(0,0)
 
 func _ready():
 	set_process(true)
 	target = get_tree().get_root().get_node("Node2D/Player")
-	maxSpeed = 150
+	maxSpeed = 130
 	pass
 
 func _process(delta):
 	update()
 	toTarget = target.position - position
+	toTargetHeading = toTarget + target.velocity
 	#velocity += seek(target.position)
 	#velocity += flee(target.position)
-	velocity += arrive(target.position, 2)
+	#velocity += arrive(target.position, 2)
+	velocity += pursuit(target.position)
 	position += velocity * delta
 	#rotation = velocity.angle()
 	rotation = velocity.angle()
 	
 
 func seek(tPosition):
-	#desiredVelocity = Vector2(tPosition - self.position).normalized() * maxSpeed
-	desiredVelocity = toTarget.normalized() * maxSpeed
+	desiredVelocity = (tPosition - position).normalized() * maxSpeed
 	
 	return desiredVelocity - velocity
 
@@ -57,27 +59,27 @@ func arrive(tPosition, deceleration):
 		return (desiredVelocity - velocity)
 	return Vector2(0,0)
 
-##func Pursuit():
-#if the evader is ahead and facing the agent then we can just seek
-#for the evader's current position.
-	# nasze toTarget: Vector2D ToEvader = evader->Pos() - m_pVehicle->Pos()
-	##var RelativeHeading = m_pVehicle->Heading().dot(evader->Heading())
-	##if ((ToEvader.Dot(m_pVehicle->Heading()) > 0) && (RelativeHeading < -0.95)): #acos(0.95)=18 degs
-	##	return Seek(evader->Pos())
+func pursuit(tPosition):
+#if the evader is ahead and facing the agent then we can just seek for the evader's current position.
+	var relativeHeading = velocity.dot(target.velocity)
+	if ((toTarget.dot(velocity) > 0) && (relativeHeading < -0.95)): #acos(0.95)=18 degs
+		print("NO")
+		return seek(tPosition)
 	#Not considered ahead so we predict where the evader will be.
 	#the look-ahead time is proportional to the distance between the evader
 	#and the pursuer; and is inversely proportional to the sum of the
 	#agents' velocities
-	##var LookAheadTime = ToEvader.Length() / (m_pVehicle->MaxSpeed() + evader->Speed())
+	var lookAheadTime = toTarget.length() / (maxSpeed + target.speed)
 	#now seek to the predicted future position of the evader
-	##return Seek(evader->Pos() + evader->Velocity() * LookAheadTime);
+	return seek(tPosition + target.velocity * lookAheadTime)
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
-	draw_vector(Vector2(0,0), target.position - position, Color(0, 255, 0), 5)  # green
-	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)                                # red
+	draw_vector(Vector2(0,0), toTargetHeading, Color(0, 0, 255), 5)  # blue
+	draw_vector(Vector2(0,0), toTarget, Color(0, 255, 0), 5)  # green
+	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)  # red
 	
-	
+
 func draw_vector( origin, vector, color, arrow_size ):
 	if vector.length_squared() > 1:
 		var points    = []
