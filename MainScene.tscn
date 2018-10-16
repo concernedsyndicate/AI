@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Monster.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Monster.gd" type="Script" id=3]
+
+[node name="Node2D" type="Node2D" index="0"]
+
+[node name="Player" parent="." index="0" instance=ExtResource( 1 )]
+
+position = Vector2( 578, 279 )
+
+[node name="Monster" parent="." index="1" instance=ExtResource( 2 )]
+
+position = Vector2( 233.992, 338.938 )
+script = ExtResource( 3 )
+
+
