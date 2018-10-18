@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scripts/MapSettings.gd" type="Script" id=1]
 [ext_resource path="res://Nodes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Nodes/Monster.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Scripts/Monster.gd" type="Script" id=4]
-[ext_resource path="res://Nodes/Obstacle.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Nodes/Obstacle.tscn" type="PackedScene" id=4]
 
 [node name="Game" type="Node2D"]
 
@@ -18,9 +17,12 @@ rotation_speed = 2.5
 
 [node name="Monster" parent="." instance=ExtResource( 3 )]
 position = Vector2( 233.992, 338.938 )
-script = ExtResource( 4 )
 _sections_unfolded = [ "Transform" ]
 
-[node name="Obstacle" parent="." instance=ExtResource( 5 )]
+[node name="Monster2" parent="." instance=ExtResource( 3 )]
+position = Vector2( 423.012, 516.503 )
+_sections_unfolded = [ "Transform" ]
+
+[node name="Obstacle" parent="." instance=ExtResource( 4 )]
 position = Vector2( 379.234, 105.524 )
 

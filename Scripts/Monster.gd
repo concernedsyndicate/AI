@@ -6,6 +6,7 @@ var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now 
 var desiredVelocity
 var toTarget = Vector2(0,0)
 var toTargetHeading = Vector2(0,0)
+var is_damaging = -100
 
 func _ready():
 	maxSpeed = 130
@@ -22,6 +23,11 @@ func _process(delta):
 	#rotation = velocity.angle()
 	rotation = velocity.angle()
 	
+	if is_damaging >= 0:
+		is_damaging -= delta
+	elif is_damaging > -100:
+		is_damaging = 1
+		target.health -= 1
 
 func seek(tPosition):
 	desiredVelocity = (tPosition - position).normalized() * maxSpeed
@@ -72,9 +78,9 @@ func pursuit(tPosition):
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
-	draw_vector(Vector2(0,0), toTargetHeading, Color(0, 0, 255), 5)  # blue
-	draw_vector(Vector2(0,0), toTarget, Color(0, 255, 0), 5)  # green
-	draw_vector(Vector2(0,0), velocity, Color(255, 0, 0), 5)  # red
+	draw_vector(Vector2(0,0), toTargetHeading, Color(0, 0, 1, 0.5), 5)  # blue
+	draw_vector(Vector2(0,0), toTarget, Color(0, 1, 0, 0.5), 5)  # green
+	draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.5), 5)  # red
 	
 
 func draw_vector( origin, vector, color, arrow_size ):
@@ -92,3 +98,12 @@ func Vec2DistanceSq(one, two):
 	var ySep = two.y - one.y;
 	var xSep = two.x - one.x;
 	return ySep * ySep + xSep * xSep;
+
+
+func on_collision(body):
+	if body.is_in_group("player"):
+		is_damaging = 0
+
+func on_decolission(body):
+	if body.is_in_group("player"):
+		is_damaging = -100
