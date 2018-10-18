@@ -13,7 +13,6 @@ func _ready():
 	max_speed = 130
 
 func _process(delta):
-	update()
 	to_target = target.position - position
 	to_target_heading = to_target + target.velocity
 	#velocity += seek(target.position)
@@ -29,6 +28,8 @@ func _process(delta):
 	elif is_damaging > -100:
 		is_damaging = 1
 		target.health -= 1
+	
+	update()
 
 func seek(target_position):
 	desired_velocity = (target_position - position).normalized() * max_speed
@@ -38,34 +39,33 @@ func flee(target_position):
 	# only flee if the target is within 'panic distance'. Work in distance
 	# squared space.
 	var panic_distance_sq = 300.0 * 300.0;
-	if (vec_to_distance_sq(self.position, target_position) > panic_distance_sq):
+	if vec_to_distance_sq(self.position, target_position) > panic_distance_sq:
 		return Vector2(0,0)
 	
 	desired_velocity = (position - target_position).normalized() * max_speed
 	
-	return (desired_velocity - velocity)
+	return desired_velocity - velocity
 
 func arrive(target_position, deceleration):
-	#calculate the distance to the target position
 	var dist = to_target.length()
-	if (dist > 0):
+	if dist > 0:
 		#because Deceleration is enumerated as an int, this value is required
 		#to provide fine tweaking of the deceleration.
-		var decelerationTweaker = 0.3
+		var deceleration_tweaker = 0.3
 		#calculate the speed required to reach the target given the desired deceleration
-		var speed = dist / (deceleration * decelerationTweaker)
+		var speed = dist / deceleration * deceleration_tweaker
 		#make sure the velocity does not exceed the max
 		speed = clamp(speed, 0, max_speed)
 		#from here proceed just like Seek except we don't need to normalize the to_target vector
 		#because we have already gone to the trouble of calculating its length: dist.
 		desired_velocity = to_target * speed / dist
-		return (desired_velocity - velocity)
+		return desired_velocity - velocity
 	return Vector2(0,0)
 
 func pursuit(target_position):
 #if the evader is ahead and facing the agent then we can just seek for the evader's current position.
-	var relativeHeading = velocity.dot(target.velocity)
-	if ((to_target.dot(velocity) > 0) && (relativeHeading < -0.95)): #acos(0.95)=18 degs
+	var relative_heading = velocity.dot(target.velocity)
+	if to_target.dot(velocity) > 0 and relative_heading < -0.95: #acos(0.95)=18 degs
 		print("NO")
 		return seek(target_position)
 	#Not considered ahead so we predict where the evader will be.
@@ -84,11 +84,11 @@ func _draw():
 
 func draw_vector( origin, vector, color, arrow_size ):
 	if vector.length_squared() > 1:
-		var points    = []
+		var points = []
 		var direction = vector.normalized()
-		points.push_back(vector + direction * arrow_size * 2 )
-		points.push_back(vector + direction.rotated(  PI / 2 ) * arrow_size )
-		points.push_back(vector + direction.rotated( -PI / 2 ) * arrow_size )
+		points.push_back(vector + direction * arrow_size * 2)
+		points.push_back(vector + direction.rotated(PI / 2) * arrow_size)
+		points.push_back(vector + direction.rotated(-PI / 2) * arrow_size)
 		draw_polygon(points, PoolColorArray([color]))
 		draw_line(origin, vector, color, arrow_size )
 
