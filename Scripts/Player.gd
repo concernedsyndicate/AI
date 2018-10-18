@@ -39,7 +39,7 @@ func process_attack(delta):
 		bullet.rotation = rotation
 		
 		if ray.is_colliding():
-			ray.get_collider().queue_free()
+			if ray.get_collider().is_in_group("monsters"): ray.get_collider().queue_free()
 			bullet.line.points[1].x = (global_position - ray.get_collision_point()).length()
 
 func _draw():
