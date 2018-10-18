@@ -17,11 +17,11 @@ rotation_speed = 2.5
 
 [node name="Monster" parent="." instance=ExtResource( 3 )]
 position = Vector2( 233.992, 338.938 )
-_sections_unfolded = [ "Transform" ]
+_sections_unfolded = [ "Collision", "Transform" ]
 
 [node name="Monster2" parent="." instance=ExtResource( 3 )]
 position = Vector2( 423.012, 516.503 )
-_sections_unfolded = [ "Transform" ]
+_sections_unfolded = [ "Collision", "Transform" ]
 
 [node name="Obstacle" parent="." instance=ExtResource( 4 )]
 position = Vector2( 379.234, 105.524 )

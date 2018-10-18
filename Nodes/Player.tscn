@@ -8,7 +8,7 @@
 custom_solver_bias = 0.0
 radius = 30.0
 
-[sub_resource type="Gradient" id=4]
+[sub_resource type="Gradient" id=2]
 
 offsets = PoolRealArray( 0 )
 colors = PoolColorArray( 0, 0, 0, 1 )
@@ -16,19 +16,19 @@ colors = PoolColorArray( 0, 0, 0, 1 )
 [sub_resource type="GradientTexture" id=3]
 
 flags = 4
-gradient = SubResource( 4 )
+gradient = SubResource( 2 )
 width = 96
 _sections_unfolded = [ "Resource", "gradient" ]
 
-[sub_resource type="Gradient" id=5]
+[sub_resource type="Gradient" id=4]
 
 offsets = PoolRealArray( 0.728 )
 colors = PoolColorArray( 1, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=6]
+[sub_resource type="GradientTexture" id=5]
 
 flags = 4
-gradient = SubResource( 5 )
+gradient = SubResource( 4 )
 width = 96
 _sections_unfolded = [ "gradient" ]
 
@@ -95,7 +95,7 @@ mouse_filter = 2
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 4
-text = "1000"
+text = "100"
 align = 1
 valign = 2
 percent_visible = 1.0
@@ -119,17 +119,17 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 min_value = 0.0
-max_value = 1000.0
+max_value = 100.0
 step = 1.0
 page = 0.0
-value = 1000.0
+value = 100.0
 exp_edit = false
 rounded = false
 allow_greater = false
 allow_lesser = false
 texture_under = SubResource( 3 )
 texture_over = null
-texture_progress = SubResource( 6 )
+texture_progress = SubResource( 5 )
 tint_under = Color( 1, 1, 1, 1 )
 tint_over = Color( 1, 1, 1, 1 )
 tint_progress = Color( 1, 1, 1, 1 )
