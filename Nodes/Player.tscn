@@ -138,3 +138,11 @@ radial_center_offset = Vector2( 0, 0 )
 nine_patch_stretch = false
 _sections_unfolded = [ "Rect", "texture_under" ]
 
+[node name="Railcast" type="RayCast2D" parent="."]
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 1000, 0 )
+collision_mask = 2
+collide_with_areas = true
+collide_with_bodies = false
+

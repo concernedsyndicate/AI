@@ -78,9 +78,9 @@ func pursuit(target_position):
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
-	draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.5), 5)  # blue
-	draw_vector(Vector2(0,0), to_target, Color(0, 1, 0, 0.5), 5)  # green
-	draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.5), 5)  # red
+	draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.1), 5)  # blue
+	draw_vector(Vector2(0,0), to_target, Color(0, 1, 0, 0.1), 5)  # green
+	draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.1), 5)  # red
 
 func draw_vector( origin, vector, color, arrow_size ):
 	if vector.length_squared() > 1:
