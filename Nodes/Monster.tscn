@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/Enemy.png" type="Texture" id=1]
 
 [sub_resource type="CircleShape2D" id=1]
 
@@ -17,7 +17,6 @@ audio_bus_override = false
 audio_bus_name = "Master"
 
 [node name="Sprite" type="Sprite" parent="."]
-self_modulate = Color( 0.796875, 0.152527, 0.152527, 1 )
 rotation = 1.5708
 texture = ExtResource( 1 )
 _sections_unfolded = [ "Material", "Transform", "Visibility" ]
