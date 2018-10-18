@@ -1,34 +1,29 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/Player.gd" type="Script" id=1]
 [ext_resource path="res://Sprites/Player.png" type="Texture" id=2]
 
-[sub_resource type="CircleShape2D" id=1]
-
-custom_solver_bias = 0.0
-radius = 30.0
-
-[sub_resource type="Gradient" id=2]
+[sub_resource type="Gradient" id=1]
 
 offsets = PoolRealArray( 0 )
 colors = PoolColorArray( 0, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=3]
+[sub_resource type="GradientTexture" id=2]
 
 flags = 4
-gradient = SubResource( 2 )
+gradient = SubResource( 1 )
 width = 96
 _sections_unfolded = [ "Resource", "gradient" ]
 
-[sub_resource type="Gradient" id=4]
+[sub_resource type="Gradient" id=3]
 
 offsets = PoolRealArray( 0.728 )
 colors = PoolColorArray( 1, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=5]
+[sub_resource type="GradientTexture" id=4]
 
 flags = 4
-gradient = SubResource( 4 )
+gradient = SubResource( 3 )
 width = 96
 _sections_unfolded = [ "gradient" ]
 
@@ -50,8 +45,9 @@ rotation = 1.5708
 texture = ExtResource( 2 )
 _sections_unfolded = [ "Transform" ]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 1 )
+[node name="CollisionShape2D" type="CollisionPolygon2D" parent="."]
+build_mode = 0
+polygon = PoolVector2Array( -24, -32, 32, 0, -24, 32 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 1
@@ -127,9 +123,9 @@ exp_edit = false
 rounded = false
 allow_greater = false
 allow_lesser = false
-texture_under = SubResource( 3 )
+texture_under = SubResource( 2 )
 texture_over = null
-texture_progress = SubResource( 5 )
+texture_progress = SubResource( 4 )
 tint_under = Color( 1, 1, 1, 1 )
 tint_over = Color( 1, 1, 1, 1 )
 tint_progress = Color( 1, 1, 1, 1 )
