@@ -1,6 +1,6 @@
 extends Area2D
 
-var target
+onready var target = $"../Player"
 var maxSpeed
 var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now too
 var desiredVelocity
@@ -8,10 +8,7 @@ var toTarget = Vector2(0,0)
 var toTargetHeading = Vector2(0,0)
 
 func _ready():
-	set_process(true)
-	target = get_tree().get_root().get_node("Node2D/Player")
 	maxSpeed = 130
-	pass
 
 func _process(delta):
 	update()
