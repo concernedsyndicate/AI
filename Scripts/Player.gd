@@ -43,8 +43,8 @@ func process_attack(delta):
 			bullet.line.points[1].x = (global_position - ray.get_collision_point()).length()
 
 func _draw():
-	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(1, 0, 0, 0.1), 1)
-	# dlaczego nie jest w stanie rysowac dla 'velocity' ? //bo musisz robić update()
+	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(0, 0.5, 1, 0.4), 5)
+	# dlaczego nie jest w stanie rysowac dla 'velocity' ? //bo musisz robić update() //dzięki, teraz tylko wykminić dlaczego źle rysuje wtedy
 
 func set_health(h):
 	health = h
