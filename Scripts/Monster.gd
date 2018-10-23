@@ -1,6 +1,6 @@
 extends Area2D
 
-onready var target = $"../Player"
+onready var target = get_tree().get_nodes_in_group("player")[0]
 
 var max_speed
 var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now too

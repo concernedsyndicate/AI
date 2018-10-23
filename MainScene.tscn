@@ -1,10 +1,10 @@
 [gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://Sprites/cos.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/Background.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/MapSettings.gd" type="Script" id=2]
 [ext_resource path="res://Nodes/Player.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Nodes/Monster.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Nodes/Obstacle.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Nodes/Obstacle.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Nodes/Monster.tscn" type="PackedScene" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 
@@ -28,15 +28,16 @@ extents = Vector2( 1, 1 )
 
 [node name="Game" type="Node2D"]
 
-[node name="background" type="Sprite" parent="."]
-position = Vector2( 600, 600 )
-rotation = 1.5708
-scale = Vector2( 1, 1.5 )
+[node name="Background" type="Sprite" parent="."]
 z_index = -4096
 texture = ExtResource( 1 )
-_sections_unfolded = [ "Transform", "Z Index" ]
+centered = false
+region_enabled = true
+region_rect = Rect2( 0, 0, 3000, 3000 )
+_sections_unfolded = [ "Offset", "Region", "Transform", "Z Index" ]
 
 [node name="MapBoundary" type="StaticBody2D" parent="."]
+editor/display_folded = true
 input_pickable = false
 collision_layer = 1
 collision_mask = 1
@@ -45,7 +46,7 @@ constant_angular_velocity = 0.0
 physics_material_override = null
 script = ExtResource( 2 )
 _sections_unfolded = [ "Collision" ]
-bounds = Rect2( 0, 0, 1200, 1200 )
+bounds = Rect2( 0, 0, 3000, 3000 )
 
 [node name="Edge" type="CollisionShape2D" parent="MapBoundary"]
 shape = SubResource( 1 )
@@ -68,15 +69,146 @@ position = Vector2( 578, 279 )
 speed = 350
 rotation_speed = 2.5
 
-[node name="Monster" parent="." instance=ExtResource( 4 )]
-position = Vector2( 233.992, 338.938 )
-_sections_unfolded = [ "Collision", "Transform" ]
+[node name="Obstacles" type="Node2D" parent="."]
+editor/display_folded = true
 
-[node name="Monster2" parent="." instance=ExtResource( 4 )]
-position = Vector2( 423.012, 516.503 )
-_sections_unfolded = [ "Collision", "Transform" ]
-
-[node name="Obstacle" parent="." instance=ExtResource( 5 )]
+[node name="Obstacle" parent="Obstacles" instance=ExtResource( 4 )]
 position = Vector2( 379.234, 105.524 )
-_sections_unfolded = [ "Collision", "Material", "Visibility" ]
+_sections_unfolded = [ "Collision", "Material" ]
+
+[node name="Obstacle2" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 914.063, 923.497 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 256
+
+[node name="Obstacle3" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1568.62, 377.59 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 192
+
+[node name="Obstacle4" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 328.405, 1620.46 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 64
+
+[node name="Obstacle5" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 779.043, 1862.14 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 96
+
+[node name="Obstacle6" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1292.62, 1431.64 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 96
+
+[node name="Obstacle7" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1672.77, 2242.29 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 256
+
+[node name="Obstacle17" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1002.65, 2446.83 )
+_sections_unfolded = [ "Collision", "Material" ]
+
+[node name="Obstacle18" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 439.671, 2661.11 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 192
+
+[node name="Obstacle19" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 2247.43, 582.575 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 192
+
+[node name="Obstacle8" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 2324.81, 1341.01 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 384
+
+[node name="Obstacle9" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 2480.89, 2244.8 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 64
+
+[node name="Obstacle10" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 2312.22, 2700.48 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 32
+
+[node name="Obstacle11" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1823.82, 2798.66 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Obstacle12" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1441.15, 2763.42 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Obstacle13" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1582.7, 2681.9 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Obstacle14" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1580.76, 2886.44 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Obstacle15" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 1849.58, 2615.66 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Obstacle16" parent="Obstacles" instance=ExtResource( 4 )]
+position = Vector2( 2102.83, 2820.21 )
+_sections_unfolded = [ "Collision", "Material" ]
+radius = 16
+
+[node name="Monsters" type="Node2D" parent="."]
+editor/display_folded = true
+
+[node name="Monster" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 1541.11, 769.45 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster2" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 1730.13, 947.015 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster3" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 1090.32, 1815.55 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster4" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 2753.21, 2894.26 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster5" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 762.69, 2884.99 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster6" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 153.789, 2452.27 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster7" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 2688.3, 1886.64 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster8" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 2675.94, 582.293 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster9" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 2476.27, 282.788 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster10" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 2012.33, 1891.9 )
+_sections_unfolded = [ "Collision", "Transform" ]
+
+[node name="Monster11" parent="Monsters" instance=ExtResource( 5 )]
+position = Vector2( 1683.46, 2758.11 )
+_sections_unfolded = [ "Collision", "Transform" ]
 

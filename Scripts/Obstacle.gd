@@ -8,10 +8,7 @@ func _ready():
 		$Sprite.scale = Vector2(radius / 128.0, radius / 128.0)
 		$CollisionShape2D.shape.radius = radius
 
-func _process(delta):
-	if Engine.editor_hint:
-		$Sprite.modulate.a = 0.1
-		update()
+func _process(delta): if Engine.editor_hint: update()
 
 func _draw():
-	draw_circle(Vector2(), radius, Color(0, 1, 0))
+	if Engine.editor_hint: draw_circle(Vector2(), radius, Color(0, 1, 0, 0.2))

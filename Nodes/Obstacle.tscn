@@ -5,6 +5,7 @@
 
 [sub_resource type="CircleShape2D" id=1]
 
+resource_local_to_scene = true
 custom_solver_bias = 0.0
 radius = 10.0
 
@@ -22,9 +23,11 @@ _sections_unfolded = [ "Collision" ]
 radius = 128
 
 [node name="Sprite" type="Sprite" parent="."]
-modulate = Color( 1, 1, 1, 0.1 )
+show_behind_parent = true
 texture = ExtResource( 2 )
+_sections_unfolded = [ "Visibility" ]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
+_sections_unfolded = [ "shape" ]
 

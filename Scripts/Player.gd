@@ -19,12 +19,12 @@ func _process(delta):
 	$UI.rotation = -rotation
 
 func process_move(delta):
-	velocity = Vector2(speed * (int(Input.is_action_pressed("up")) - int(Input.is_action_pressed("down"))), 0).rotated(rotation)
-	velocity += Vector2(speed * (int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))), 0).rotated(rotation + PI/2)
+	velocity.x = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
+	velocity.y = int(Input.is_action_pressed("down")) - int(Input.is_action_pressed("up"))
 
 	rotation = (get_global_mouse_position() - global_position).angle()
 	
-	move_and_slide(velocity)
+	move_and_slide(velocity.normalized() * speed)
 
 func process_attack(delta):
 	cooldown -= delta
@@ -38,6 +38,9 @@ func set_health(h):
 	health = h
 	$UI/Health.text = str(h)
 	$UI/Health/Bar.value = h
+	
+	if health <= 0:
+		get_tree().change_scene("res://GameOver.tscn")
 
 func _input(event):
 	if cooldown <= 0 and event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
