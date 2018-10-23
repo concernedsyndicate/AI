@@ -29,8 +29,18 @@ func process_move(delta):
 func process_attack(delta):
 	cooldown -= delta
 	$Sprite.modulate.b = 1 - clamp(cooldown, 0, RAIL_COOLDOWN) / RAIL_COOLDOWN
-	
-	if Input.is_action_just_pressed("shoot") and cooldown <= 0:
+
+func _draw():
+	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(0, 0.5, 1, 0.4), 5)
+	# dlaczego nie jest w stanie rysowac dla 'velocity' ? //bo musisz robić update() //dzięki, teraz tylko wykminić dlaczego źle rysuje wtedy
+
+func set_health(h):
+	health = h
+	$UI/Health.text = str(h)
+	$UI/Health/Bar.value = h
+
+func _input(event):
+	if cooldown <= 0 and event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
 		cooldown = RAIL_COOLDOWN
 		
 		var bullet = preload("res://Nodes/RailgunBullet.tscn").instance()
@@ -41,12 +51,3 @@ func process_attack(delta):
 		if ray.is_colliding():
 			if ray.get_collider().is_in_group("monsters"): ray.get_collider().queue_free()
 			bullet.line.points[1].x = (global_position - ray.get_collision_point()).length()
-
-func _draw():
-	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(0, 0.5, 1, 0.4), 5)
-	# dlaczego nie jest w stanie rysowac dla 'velocity' ? //bo musisz robić update() //dzięki, teraz tylko wykminić dlaczego źle rysuje wtedy
-
-func set_health(h):
-	health = h
-	$UI/Health.text = str(h)
-	$UI/Health/Bar.value = h

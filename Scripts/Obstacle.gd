@@ -14,4 +14,4 @@ func _process(delta):
 		update()
 
 func _draw():
-	if Engine.editor_hint: draw_circle(Vector2(), radius, Color(0, 1, 0))
+	draw_circle(Vector2(), radius, Color(0, 1, 0))
