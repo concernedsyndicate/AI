@@ -20,9 +20,9 @@ func _process(delta):
 
 func process_move(delta):
 	velocity = Vector2(speed * (int(Input.is_action_pressed("up")) - int(Input.is_action_pressed("down"))), 0).rotated(rotation)
-	rotation_dir = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	
-	rotation += rotation_dir * rotation_speed * delta
+	velocity += Vector2(speed * (int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))), 0).rotated(rotation + PI/2)
+
+	rotation = (get_global_mouse_position() - global_position).angle()
 	
 	move_and_slide(velocity)
 
