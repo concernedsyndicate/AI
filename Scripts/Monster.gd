@@ -3,11 +3,14 @@ extends Area2D
 onready var target = get_tree().get_nodes_in_group("player")[0]
 
 var max_speed
+var speed
 var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now too
 var desired_velocity
 var to_target = Vector2(0,0)
 var to_target_heading = Vector2(0,0)
 var is_damaging = -100
+var min_detection_box_length = 400
+var radius = 32 # 
 
 func _ready():
 	max_speed = 130
@@ -19,6 +22,7 @@ func _process(delta):
 	#velocity += flee(target.position)
 	#velocity += arrive(target.position, 2)
 	velocity += pursuit(target.position)
+	speed = velocity.length()
 	position += velocity * delta
 	#rotation = velocity.angle()
 	rotation = velocity.angle()
@@ -78,51 +82,47 @@ func pursuit(target_position):
 func obstacle_avoidance(obstacles): #przy wywolaniu getTree.getNodesingroup(obstacles)
 
 	#the detection box length is proportional to the agent's velocity
-	m_dDBoxLength = Prm.MinDetectionBoxLength + (speed/max_speed) * Prm.MinDetectionBoxLength
+	var detection_box_length = min_detection_box_length + (speed/max_speed) * min_detection_box_length
 	
 
 	#tag all obstacles within range of the box for processing
-#	m_pVehicle->World()->TagObstaclesWithinViewRange(m_pVehicle, m_dDBoxLength)
+#	m_pVehicle->World()->TagObstaclesWithinViewRange(m_pVehicle, detection_box_length)
 	
 	#this will keep track of the closest intersecting obstacle (CIB)
 	var closest_intersecting_obstacle
 	
 	#this will be used to track the distance to the CIB
-	double DistToClosestIP = MaxDouble
+	var DistToClosestIP = 999999999999999999999999999999999999999999999.0 # jak w godocie jest maxvalue
 	#this will record the transformed local coordinates of the CIB
-	Vector2D LocalPosOfClosestObstacle
-	std::vector<BaseGameEntity*>::const_iterator curOb = obstacles.begin()
+	var LocalPosOfClosestObstacle = Vector2()
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
 		#if the obstacle has been tagged within range proceed
-		if (obstacle.global_position - global_position).length_squared() < RANGE:
+		if (obstacle.global_position - global_position).length_squared() < 600:
 			#calculate this obstacle's position in local space
-			var LocalPos = Vector2(PointToLocalSpace(obstacle.position, m_pVehicle->Heading(), m_pVehicle->Side(), m_pVehicle->Pos()))
+			var LocalPos = Vector2(PointToLocalSpace(obstacle.position, velocity, m_pVehicle->Side(), m_pVehicle->Pos()))
 			#if the local position has a negative x value then it must lay behind the agent. (in which case it can be ignored)
 			if (LocalPos.x >= 0):
-				#if the distance from the x axis to the object's position is less than its radius + half the width of the detection box then there
-				#is a potential intersection.
-				var ExpandedRadius = obstacle.radius + m_pVehicle->BRadius()
+				#if the distance from the x axis to the object's position is less than its radius
+				# + half the width of the detection box then there is a potential intersection.
+				var ExpandedRadius = obstacle.radius + radius
 				if (fabs(LocalPos.y) < ExpandedRadius):
-					#now to do a line/circle intersection test. The center of the
-					#circle is represented by (cX, cY). The intersection points are
-					#given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0.
-					#We only need to look at the smallest positive value of x because
-					#that will be the closest point of intersection.
-					double cX = LocalPos.x
-					double cY = LocalPos.y
+					#now to do a line/circle intersection test. The center of the circle is represented by (cX, cY).
+					#The intersection points are given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0.
+					#We only need to look at the smallest positive value of x because that will be the closest point of intersection.
+					var cX = LocalPos.x
+					var cY = LocalPos.y
 					#we only need to calculate the sqrt part of the above equation once
-					double SqrtPart = sqrt(ExpandedRadius*ExpandedRadius - cY*cY)
+					var SqrtPart = sqrt(ExpandedRadius*ExpandedRadius - cY*cY)
 					
-					double ip = A - SqrtPart
+					var ip = A - SqrtPart
 					if (ip <= 0):
 						ip = A + SqrtPart
 					#test to see if this is the closest so far. If it is, keep a
 					#record of the obstacle and its local coordinates
 					if (ip < DistToClosestIP):
 						DistToClosestIP = ip
-						ClosestIntersectingObstacle = *curOb
+						ClosestIntersectingObstacle = obstacle
 						LocalPosOfClosestObstacle = LocalPos
-		++curOb
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
