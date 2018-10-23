@@ -1,4 +1,3 @@
-tool
 extends Node2D
 
 export var radius = 128
@@ -12,6 +11,3 @@ func _process(delta):
 	if Engine.editor_hint:
 		$Sprite.modulate.a = 0.1
 		update()
-
-func _draw():
-	draw_circle(Vector2(), radius, Color(0, 1, 0))

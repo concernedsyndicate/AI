@@ -78,5 +78,5 @@ _sections_unfolded = [ "Collision", "Transform" ]
 
 [node name="Obstacle" parent="." instance=ExtResource( 5 )]
 position = Vector2( 379.234, 105.524 )
-_sections_unfolded = [ "Collision", "Material", "Visibility" ]
+_sections_unfolded = [ "Collision", "Material" ]
 
