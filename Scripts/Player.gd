@@ -38,6 +38,9 @@ func set_health(h):
 	health = h
 	$UI/Health.text = str(h)
 	$UI/Health/Bar.value = h
+	
+	if health <= 0:
+		get_tree().change_scene("res://GameOver.tscn")
 
 func _input(event):
 	if cooldown <= 0 and event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
