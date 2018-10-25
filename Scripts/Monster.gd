@@ -92,37 +92,39 @@ func obstacle_avoidance(obstacles): #przy wywolaniu getTree.getNodesingroup(obst
 	var closest_intersecting_obstacle
 	
 	#this will be used to track the distance to the CIB
-	var DistToClosestIP = 999999999999999999999999999999999999999999999.0 # jak w godocie jest maxvalue
+	var dist_to_closest_ip = 999999999999999999999999999999999999999999999.0 # jak w godocie jest maxvalue
 	#this will record the transformed local coordinates of the CIB
-	var LocalPosOfClosestObstacle = Vector2()
+	var local_pos_of_closest_obstacle = Vector2()
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
 		#if the obstacle has been tagged within range proceed
 		if (obstacle.global_position - global_position).length_squared() < 600:
 			#calculate this obstacle's position in local space
-			var LocalPos = Vector2(PointToLocalSpace(obstacle.position, velocity, m_pVehicle->Side(), m_pVehicle->Pos()))
+			#var LocalPos = Vector2(PointToLocalSpace(obstacle.position, velocity, m_pVehicle->Side(), m_pVehicle->Pos()))
+			#masz jakis pomysl po co tej funkcji bylo tyle parametrów(side i vel)?
+			var local_pos = obstacle.global_position - global_position
 			#if the local position has a negative x value then it must lay behind the agent. (in which case it can be ignored)
-			if (LocalPos.x >= 0):
+			if (local_pos.x >= 0):
 				#if the distance from the x axis to the object's position is less than its radius
 				# + half the width of the detection box then there is a potential intersection.
-				var ExpandedRadius = obstacle.radius + radius
-				if (fabs(LocalPos.y) < ExpandedRadius):
+				var expanded_radius = obstacle.radius + radius
+				if (abs(local_pos.y) < expanded_radius):
 					#now to do a line/circle intersection test. The center of the circle is represented by (cX, cY).
 					#The intersection points are given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0.
 					#We only need to look at the smallest positive value of x because that will be the closest point of intersection.
-					var cX = LocalPos.x
-					var cY = LocalPos.y
+					var cX = local_pos.x
+					var cY = local_pos.y
 					#we only need to calculate the sqrt part of the above equation once
-					var SqrtPart = sqrt(ExpandedRadius*ExpandedRadius - cY*cY)
+					var sqrt_part = sqrt(expanded_radius*expanded_radius - cY*cY)
 					
-					var ip = A - SqrtPart
+					var ip = A - sqrt_part
 					if (ip <= 0):
-						ip = A + SqrtPart
+						ip = A + sqrt_part
 					#test to see if this is the closest so far. If it is, keep a
 					#record of the obstacle and its local coordinates
-					if (ip < DistToClosestIP):
-						DistToClosestIP = ip
-						ClosestIntersectingObstacle = obstacle
-						LocalPosOfClosestObstacle = LocalPos
+					if (ip < dist_to_closest_ip):
+						dist_to_closest_ip = ip
+						closest_intersecting_obstacle = obstacle
+						local_pos_of_closest_obstacle = local_pos
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
