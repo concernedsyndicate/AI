@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="AIaiaiai"
-run/main_scene="res://MainScene.tscn"
+run/main_scene="res://Scenes/MainScene.tscn"
 config/icon="res://icon.png"
 
 [debug]
@@ -25,6 +25,9 @@ gdscript/warnings/enable=false
 
 [display]
 
+window/size/width=1200
+window/size/height=800
+window/size/resizable=false
 window/dpi/allow_hidpi=true
 
 [input]

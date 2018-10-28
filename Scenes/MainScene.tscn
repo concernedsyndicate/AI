@@ -70,7 +70,6 @@ speed = 350
 rotation_speed = 2.5
 
 [node name="Obstacles" type="Node2D" parent="."]
-editor/display_folded = true
 
 [node name="Obstacle" parent="Obstacles" instance=ExtResource( 4 )]
 position = Vector2( 379.234, 105.524 )
@@ -166,7 +165,6 @@ _sections_unfolded = [ "Collision", "Material" ]
 radius = 16
 
 [node name="Monsters" type="Node2D" parent="."]
-editor/display_folded = true
 
 [node name="Monster" parent="Monsters" instance=ExtResource( 5 )]
 position = Vector2( 1541.11, 769.45 )

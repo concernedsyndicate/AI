@@ -9,7 +9,6 @@ var desired_velocity
 var to_target = Vector2(0,0)
 var to_target_heading = Vector2(0,0)
 var is_damaging = -100
-var min_detection_box_length = 400
 var radius = 32 # 
 
 func _ready():
@@ -42,8 +41,6 @@ func seek(target_position):
 	return desired_velocity - velocity
 
 func flee(target_position): 
-	# only flee if the target is within 'panic distance'. Work in distance
-	# squared space.
 	var panic_distance_sq = 300.0 * 300.0;
 	if vec_to_distance_sq(self.position, target_position) > panic_distance_sq:
 		return Vector2(0,0)
@@ -55,97 +52,68 @@ func flee(target_position):
 func arrive(target_position, deceleration):
 	var dist = to_target.length()
 	if dist > 0:
-		#because Deceleration is enumerated as an int, this value is required
-		#to provide fine tweaking of the deceleration.
 		var deceleration_tweaker = 0.3
-		#calculate the speed required to reach the target given the desired deceleration
 		var speed = dist / deceleration * deceleration_tweaker
-		#make sure the velocity does not exceed the max
+		
 		speed = clamp(speed, 0, max_speed)
-		#from here proceed just like Seek except we don't need to normalize the to_target vector
-		#because we have already gone to the trouble of calculating its length: dist.
 		desired_velocity = to_target * speed / dist
+		
 		return desired_velocity - velocity
 	return Vector2(0,0)
 
 func pursuit(target_position):
-#if the evader is ahead and facing the agent then we can just seek for the evader's current position.
 	var relative_heading = velocity.dot(target.velocity)
-	if to_target.dot(velocity) > 0 and relative_heading < -0.95: #acos(0.95)=18 degs
-		return seek(target_position)
-	#Not considered ahead so we predict where the evader will be.
-	#the look-ahead time is proportional to the distance between the evader
-	#and the pursuer; and is inversely proportional to the sum of the
-	#agents' velocities
+	
+	if to_target.dot(velocity) > 0 and relative_heading < -0.95: return seek(target_position)
+	
 	var look_ahead_time = to_target.length() / (max_speed + target.speed)
-	#now seek to the predicted future position of the evader
 	return seek(target_position + target.velocity * look_ahead_time)
 
-func obstacle_avoidance(obstacles): #przy wywolaniu get_tree().get_nodes_in_group("obstacles")
+const MIN_DETECTION_BOX_LENGTH = 200
+const BRAKING_WEIGHT = 0.2
 
-	#length ~ velocity, min = 400
-	var detection_box_length = min_detection_box_length + (speed/max_speed) * min_detection_box_length
-	
+var avoided
 
-	#tag all obstacles within range of the box for processing - 
-#	m_pVehicle->World()->TagObstaclesWithinViewRange(m_pVehicle, detection_box_length)
+func obstacle_avoidance(obstacles):
+	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/max_speed) * MIN_DETECTION_BOX_LENGTH
 	
-	#for keeping track of the closest intersecting obstacle (CIB)
+	var dist_to_closest_ip = INF
 	var closest_intersecting_obstacle
-	
-	#for tracking the distance to CIB
-	var dist_to_closest_ip = 99999999999999999999999999999999999999.0 # jak w godocie jest maxvalue?
-	
-	#for recording transformed local coordinates of the CIB
 	var local_pos_of_closest_obstacle = Vector2()
 	
 	for obstacle in obstacles:
-		#proceed if obstacle tagged within range
-		if (obstacle.global_position - global_position).length_squared() < detection_box_length:
-			#calculate this obstacle's position in local space
-			#var LocalPos = Vector2(PointToLocalSpace(obstacle.position, velocity, m_pVehicle->Side(), m_pVehicle->Pos()))
-			#po co tej funkcji z ksiazki bylo side i vel?
-			var local_pos = obstacle.global_position - global_position
-			#if local_pos has a negative x value then it lays behind agent (and can be ignored)
-			if (local_pos.x >= 0):
-				#potential intersection if dist. from x axis to obj_pos < its radius + half width of detection box
+		if (obstacle.global_position - global_position).length_squared() < detection_box_length * detection_box_length:
+			var local_pos = (obstacle.global_position - global_position).rotated(-rotation)
+			
+			if local_pos.x >= 0:
 				var expanded_radius = obstacle.radius + radius
-				if (abs(local_pos.y) < expanded_radius):
-					#Line/circle intersection test. Center of circle = (cX, cY).
-					#intersection points given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0.
-					#only need to look at the smallest positive value of x bec that will be the closest point of intersection.
+				
+				if abs(local_pos.y) < expanded_radius:
 					var cX = local_pos.x
 					var cY = local_pos.y
-					#only need to calculate the sqrt part of the above equation once
 					var sqrt_part = sqrt(expanded_radius*expanded_radius - cY*cY)
 					
 					var ip = cX - sqrt_part
-					if (ip <= 0):
-						ip = cX + sqrt_part
-					#test to see if this is the closest so far. If it is, keep a
-					#record of the obstacle and its local coordinates
-					if (ip < dist_to_closest_ip):
+					if ip <= 0: ip = cX + sqrt_part
+					
+					if ip < dist_to_closest_ip:
 						dist_to_closest_ip = ip
 						closest_intersecting_obstacle = obstacle
 						local_pos_of_closest_obstacle = local_pos
-						
-	#if intersecting obstacle found, calculate a steering force away from it
+	
 	var steering_force = Vector2()
-	if(closest_intersecting_obstacle):
-		#the closer the agent is to an object, the stronger the steering force should be
+	if closest_intersecting_obstacle:
 		var multiplier = 1.0 + (detection_box_length - local_pos_of_closest_obstacle.x) / detection_box_length
-		#calculate the lateral force
-		
 		steering_force.y = (closest_intersecting_obstacle.radius - local_pos_of_closest_obstacle.y) * multiplier
-		#apply a braking force ~ to obstacle’s distance from the vehicle
+		steering_force.x = (closest_intersecting_obstacle.radius - local_pos_of_closest_obstacle.x) * BRAKING_WEIGHT
 		
-		var braking_weight = 0.2
-		steering_force.x = (closest_intersecting_obstacle.radius - local_pos_of_closest_obstacle.x) * braking_weight
-	else:
+		avoided = true #powoduje mniejsze skakanie obrotu, ale tak meh
+	elif !avoided:
 		return pursuit(target.position)
-	#finally, convert the steering vector from local to world space
-#	return VectorToWorldSpace(SteeringForce, m_pVehicle->Heading(), m_pVehicle->Side())
-	return steering_force + global_position
+	else:
+		avoided = false
+	
+	return steering_force.rotated(rotation)
 
 func _draw():
 	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
