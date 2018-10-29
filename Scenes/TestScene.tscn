@@ -78,6 +78,6 @@ _sections_unfolded = [ "Collision", "Material" ]
 [node name="Monsters" type="Node2D" parent="."]
 
 [node name="Monster" parent="Monsters" instance=ExtResource( 5 )]
-position = Vector2( 1541.11, 769.45 )
+position = Vector2( 701.32, 537.48 )
 _sections_unfolded = [ "Collision", "Transform" ]
 
