@@ -14,6 +14,7 @@ var radius = 32 #
 func _ready():
 	speed = 0
 	max_speed = 130
+	rotation = randf() * PI*2
 	
 	var theta = randf() * 2*PI
 	wander_target = Vector2(WANDER_RADIUS * cos(theta), WANDER_RADIUS * sin(theta))
@@ -25,8 +26,8 @@ func _process(delta):
 	#velocity += flee(target.position)
 	#velocity += arrive(target.position, 2)
 	#velocity += pursuit(target.position)
-#	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
 	velocity = (velocity + wander()).clamped(max_speed)
+	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
 	speed = velocity.length()
 	position += velocity * delta
 	#rotation = velocity.angle()
@@ -113,20 +114,21 @@ func obstacle_avoidance(obstacles):
 		
 		avoided = true #powoduje mniejsze skakanie obrotu, ale tak meh
 	elif !avoided:
-		return pursuit(target.position)
+		pass #meh meh
+#		return pursuit(target.position)
 	else:
 		avoided = false
 	
 	return steering_force.rotated(rotation)
 
-const WANDER_RADIUS = 256
+const WANDER_RADIUS = 16
 const WANDER_DISTANCE = 256
-const WANDER_JITTER = 0.001
+const WANDER_JITTER = 16
 
 var wander_target
 
 func wander():
-	wander_target = (wander_target + Vector2(-1 + randf()*2 * WANDER_JITTER, -1 + randf()*2 * WANDER_JITTER)).normalized()
+	wander_target = (wander_target + Vector2((-1 + randf()*2) * WANDER_JITTER, (-1 + randf()*2) * WANDER_JITTER)).normalized()
 	wander_target *= WANDER_RADIUS
 	var target_local = wander_target + Vector2(WANDER_DISTANCE, 0)
 	return target_local.rotated(rotation)
@@ -138,11 +140,12 @@ func get_hiding_position(obstacle, target):
 	var towards_obstacle = (obstacle.global_position - target.global_position).normalized()
 	return towards_obstacle * dist_away * obstacle.global_position
 
-func _draw(): #te wektory są niepotrzebne i przeszkadzają :/
-	draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
-	draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.3), 5)  # blue
-	draw_vector(Vector2(0,0), to_target, Color(0, 1, 0, 0.3), 5)  # green
-	draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.4), 5)  # red
+func _draw():
+	if Input.is_key_pressed(KEY_CONTROL):
+		draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
+		draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.3), 5)  # blue
+		draw_vector(Vector2(0,0), to_target, Color(0, 1, 0, 0.3), 5)  # green
+		draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.4), 5)  # red
 
 func draw_vector( origin, vector, color, arrow_size ):
 	if vector.length_squared() > 1:
