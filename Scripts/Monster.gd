@@ -9,7 +9,7 @@ var desired_velocity
 var to_target = Vector2(0,0)
 var to_target_heading = Vector2(0,0)
 var is_damaging = -100
-var radius = 32 # 
+const radius = 32 # 
 
 func _ready():
 	speed = 0
@@ -25,9 +25,10 @@ func _process(delta):
 	#velocity += seek(target.position)
 	#velocity += flee(target.position)
 	#velocity += arrive(target.position, 2)
-	#velocity += pursuit(target.position)
 	velocity = (velocity + wander()).clamped(max_speed)
+	velocity += pursuit(target.position)
 	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
+	position += declip()
 	speed = velocity.length()
 	position += velocity * delta
 	#rotation = velocity.angle()
@@ -77,7 +78,7 @@ func pursuit(target_position):
 const MIN_DETECTION_BOX_LENGTH = 200
 const BRAKING_WEIGHT = 0.2
 
-var avoided
+#var avoided
 
 func obstacle_avoidance(obstacles):
 	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/max_speed) * MIN_DETECTION_BOX_LENGTH
@@ -112,14 +113,24 @@ func obstacle_avoidance(obstacles):
 		steering_force.y = (closest_intersecting_obstacle.radius - local_pos_of_closest_obstacle.y) * multiplier
 		steering_force.x = (closest_intersecting_obstacle.radius - local_pos_of_closest_obstacle.x) * BRAKING_WEIGHT
 		
-		avoided = true #powoduje mniejsze skakanie obrotu, ale tak meh
-	elif !avoided:
-		pass #meh meh
-#		return pursuit(target.position)
-	else:
-		avoided = false
+#		avoided = true #powoduje mniejsze skakanie obrotu, ale tak meh
+#	elif !avoided:
+#		pass #meh meh
+##		return pursuit(target.position)
+#	else:
+#		avoided = false
 	
 	return steering_force.rotated(rotation)
+
+func declip():
+	var pos = position# + velocity
+	for obstacle in get_tree().get_nodes_in_group("obstacles"):
+		if (obstacle.position - pos).length() < obstacle.radius + radius:
+			return -(obstacle.position - pos).normalized() * ((obstacle.position - pos).length() - obstacle.radius - radius/2)
+	for obstacle in get_tree().get_nodes_in_group("monsters"):
+		if (obstacle.position - pos).length() < obstacle.radius + radius:
+			return -(obstacle.position - pos).normalized() * ((obstacle.position - pos).length() - obstacle.radius - radius/2)
+	return Vector2()
 
 const WANDER_RADIUS = 16
 const WANDER_DISTANCE = 256
