@@ -147,10 +147,23 @@ func wander():
 
 const DISTANCE_FROM_BOUNDARY = 30
 
-func get_hiding_position(obstacle, target):
+func get_hiding_position(obstacle):
 	var dist_away = obstacle.radius + DISTANCE_FROM_BOUNDARY
 	var towards_obstacle = (obstacle.global_position - target.global_position).normalized()
-	return towards_obstacle * dist_away * obstacle.global_position
+	return towards_obstacle * dist_away + obstacle.global_position
+
+func hide():
+	var dist_to_closest = INF
+	var best_hiding_spot = Vector2()
+	
+	for obstacle in get_tree().get_nodes_in_group("obstacles"):
+		
+		var hiding_spot = get_hiding_position(obstacle)
+		
+		var dist #TODO 132pdf/109book
+
+
+
 
 func _draw():
 	if Input.is_key_pressed(KEY_CONTROL):
