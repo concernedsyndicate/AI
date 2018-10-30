@@ -27,11 +27,11 @@ func _process(delta):
 	#velocity += arrive(target.position, 2)
 	velocity = (velocity + wander()).clamped(max_speed)
 	velocity += pursuit(target.position)
-	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
+	speed = velocity.length()
+#	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
 	position += declip()
 	speed = velocity.length()
 	position += velocity * delta
-	#rotation = velocity.angle()
 	rotation = velocity.angle()
 	
 	if is_damaging >= 0:
@@ -123,13 +123,14 @@ func obstacle_avoidance(obstacles):
 	return steering_force.rotated(rotation)
 
 func declip():
-	var pos = position# + velocity
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
-		if (obstacle.position - pos).length() < obstacle.radius + radius:
-			return -(obstacle.position - pos).normalized() * ((obstacle.position - pos).length() - obstacle.radius - radius/2)
-	for obstacle in get_tree().get_nodes_in_group("monsters"):
-		if (obstacle.position - pos).length() < obstacle.radius + radius:
-			return -(obstacle.position - pos).normalized() * ((obstacle.position - pos).length() - obstacle.radius - radius/2)
+		if (obstacle.position - position).length() < obstacle.radius + radius:
+			return -(obstacle.position - position).normalized() * ((obstacle.radius + radius) - (obstacle.position - position).length())
+	
+	for monster in get_tree().get_nodes_in_group("monsters"):
+		if monster != self and (monster.position - position).length() < monster.radius + radius:
+			monster.position += (monster.position - position).normalized() * ((monster.radius + radius) - (monster.position - position).length())
+			return -(monster.position - position).normalized() * ((monster.radius + radius) - (monster.position - position).length())
 	return Vector2()
 
 const WANDER_RADIUS = 16
