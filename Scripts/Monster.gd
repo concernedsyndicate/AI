@@ -30,7 +30,7 @@ func _process(delta):
 	update()
 
 func next_step():
-	return hide()
+	return hide() + obstacle_avoidance()
 	return wander()
 
 func seek(target_position):
@@ -80,7 +80,7 @@ func evade():
 const MIN_DETECTION_BOX_LENGTH = 200
 const BRAKING_WEIGHT = 0.2
 
-func obstacle_avoidance(obstacles):
+func obstacle_avoidance():
 	var speed = 100 #TODO
 	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/MAX_SPEED) * MIN_DETECTION_BOX_LENGTH
 	
@@ -88,7 +88,7 @@ func obstacle_avoidance(obstacles):
 	var closest_intersecting_obstacle
 	var local_pos_of_closest_obstacle = Vector2()
 	
-	for obstacle in obstacles:
+	for obstacle in get_tree().get_nodes_in_group("obstacles"):
 		if (obstacle.position - position).length_squared() < detection_box_length * detection_box_length:
 			var local_pos = (obstacle.position - position).rotated(-rotation)
 			
@@ -167,7 +167,6 @@ func hide():
 
 	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
 	else: return evade()
-
 
 func _draw():
 	if Input.is_key_pressed(KEY_CONTROL):
