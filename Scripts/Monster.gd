@@ -2,7 +2,7 @@ extends Area2D
 
 onready var target = get_tree().get_nodes_in_group("player")[0]
 
-const MAX_SPEED = 130
+const MAX_SPEED = 300
 const RADIUS = 32
 
 var velocity = Vector2(0,0)
@@ -30,6 +30,7 @@ func _process(delta):
 	update()
 
 func next_step():
+	return hide()
 	return wander()
 
 func seek(target_position):
@@ -45,28 +46,31 @@ func flee(target_position):
 	var desired_velocity = (position - target_position).normalized() * MAX_SPEED
 	return desired_velocity - velocity
 
+enum Deceleration{SLOW = 3, NORMAL = 2, FAST = 1}
+const DECELERATION_TWEAKER = 0.3
+
 func arrive(target_position, deceleration):
 	var to_target = target_position - position
 	var dist = to_target.length()
 	
 	if dist > 0:
-		var deceleration_tweaker = 0.3
-		var speed = dist / deceleration * deceleration_tweaker
-		
+		var speed = dist / deceleration * DECELERATION_TWEAKER
 		speed = clamp(speed, 0, MAX_SPEED)
-		var desired_velocity = to_target * speed / dist
 		
+		var desired_velocity = to_target * speed / dist
 		return desired_velocity - velocity
+	
 	return Vector2(0,0)
 
-func pursuit(target_position):
-	var relative_heading = velocity.dot(target.velocity)
-	var to_target = target_position - position
+func pursuit():
+	var to_target = target.position - position
+	var heading = velocity.normalized()
+	var relative_heading = heading.dot(target.velocity.normalized())
 	
-	if to_target.dot(velocity) > 0 and relative_heading < -0.95: return seek(target_position)
+	if to_target.dot(heading) > 0 and relative_heading < -0.95: return seek(target.position)
 	
 	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
-	return seek(target_position + target.velocity * look_ahead_time)
+	return seek(target.position + target.velocity * look_ahead_time)
 
 const MIN_DETECTION_BOX_LENGTH = 200
 const BRAKING_WEIGHT = 0.2
@@ -137,7 +141,7 @@ func wander():
 	var target_local = wander_target + Vector2(WANDER_DISTANCE, 0)
 	return target_local.rotated(rotation)
 
-const DISTANCE_FROM_BOUNDARY = 30
+const DISTANCE_FROM_BOUNDARY = 100
 
 func get_hiding_position(obstacle):
 	var dist_away = obstacle.radius + DISTANCE_FROM_BOUNDARY
@@ -154,9 +158,9 @@ func hide():
 		
 		if dist < dist_to_closest:
 			dist_to_closest = dist
-			best_hiding_spot = best_hiding_spot
+			best_hiding_spot = hiding_spot
 
-	if best_hiding_spot: return arrive(best_hiding_spot, 1)
+	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
 	else: return Vector2()#evade()
 
 
