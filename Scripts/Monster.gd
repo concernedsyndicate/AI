@@ -6,6 +6,7 @@ const MAX_SPEED = 300
 const RADIUS = 32
 
 var velocity = Vector2(0,0)
+var neighbors = []
 var is_damaging = -100
 
 func _ready():
@@ -15,6 +16,7 @@ func _ready():
 	wander_target = Vector2(WANDER_RADIUS * cos(theta), WANDER_RADIUS * sin(theta))
 
 func _process(delta):
+	update_neighbor_list()
 	velocity = (velocity + next_step()).clamped(MAX_SPEED)
 	
 	position += velocity * delta
@@ -30,6 +32,7 @@ func _process(delta):
 	update()
 
 func next_step():
+	return flock() + obstacle_avoidance()
 	return hide() + obstacle_avoidance()
 	return wander()
 
@@ -40,7 +43,7 @@ func seek(target_position):
 const PANIC_DISTANCE_SQ = pow(300, 2)
 
 func flee(target_position):
-	if vec_to_distance_sq(position, target_position) > PANIC_DISTANCE_SQ:
+	if (target_position - position).length_squared() > PANIC_DISTANCE_SQ:
 		return Vector2(0,0)
 	
 	var desired_velocity = (position - target_position).normalized() * MAX_SPEED
@@ -168,6 +171,56 @@ func hide():
 	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
 	else: return evade()
 
+const NEIGHBOR_RANGE_SQ = pow(400, 2)
+
+func update_neighbor_list():
+	neighbors.clear()
+	
+	for monster in get_tree().get_nodes_in_group("monsters"):
+		if monster != self and (monster.position - position).length_squared() < NEIGHBOR_RANGE_SQ:
+			neighbors.append(monster)
+
+func separation():
+	var steering_force = Vector2()
+	
+	for neighbor in neighbors:
+		var to_other = position - neighbor.position
+		steering_force += to_other.normalized() / to_other.length()
+	
+	return steering_force
+
+func alignment():
+	var average_heading = Vector2()
+	
+	if !neighbors.empty():
+		for neighbor in neighbors:
+			average_heading += neighbor.velocity.normalized()
+		
+		average_heading /= neighbors.size()
+		average_heading -= velocity.normalized()
+	
+	return average_heading
+
+func cohesion():
+	if !neighbors.empty():
+		var center_position = Vector2()
+		
+		for neighbor in neighbors:
+			center_position += neighbor.position
+		
+		center_position /= neighbors.size()
+		return seek(center_position)
+	
+	return Vector2()
+
+func flock():
+	var steering_force = separation() * 10 + alignment() + cohesion()
+	
+	if steering_force != Vector2():
+		return steering_force
+	else:
+		return wander()
+
 func _draw():
 	if Input.is_key_pressed(KEY_CONTROL):
 		draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
@@ -183,12 +236,7 @@ func draw_vector( origin, vector, color, arrow_size ):
 		points.push_back(vector + direction.rotated(PI / 2) * arrow_size)
 		points.push_back(vector + direction.rotated(-PI / 2) * arrow_size)
 		draw_polygon(points, PoolColorArray([color]))
-		draw_line(origin, vector, color, arrow_size )
-
-func vec_to_distance_sq(one, two):
-	var y_sep = two.y - one.y;
-	var x_sep = two.x - one.x;
-	return y_sep * y_sep + x_sep * x_sep;
+		draw_line(origin, vector, color, arrow_size)
 
 func on_collision(body):
 	if body.is_in_group("player"):

@@ -13,7 +13,6 @@ colors = PoolColorArray( 0, 0, 0, 1 )
 flags = 4
 gradient = SubResource( 1 )
 width = 96
-_sections_unfolded = [ "Resource", "gradient" ]
 
 [sub_resource type="Gradient" id=3]
 
@@ -25,7 +24,6 @@ colors = PoolColorArray( 1, 0, 0, 1 )
 flags = 4
 gradient = SubResource( 3 )
 width = 96
-_sections_unfolded = [ "gradient" ]
 
 [node name="Player" type="KinematicBody2D" groups=[
 "player",
@@ -36,14 +34,12 @@ collision_mask = 1
 collision/safe_margin = 0.08
 motion/sync_to_physics = false
 script = ExtResource( 1 )
-_sections_unfolded = [ "Transform" ]
 speed = 70
 rotation_speed = 1.5
 
 [node name="Sprite" type="Sprite" parent="."]
 rotation = 1.5708
 texture = ExtResource( 2 )
-_sections_unfolded = [ "Transform" ]
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="."]
 build_mode = 0
@@ -97,7 +93,6 @@ valign = 2
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "Rect" ]
 
 [node name="Bar" type="TextureProgress" parent="UI/Health"]
 show_behind_parent = true
@@ -132,7 +127,6 @@ tint_progress = Color( 1, 1, 1, 1 )
 radial_fill_degrees = 360.0
 radial_center_offset = Vector2( 0, 0 )
 nine_patch_stretch = false
-_sections_unfolded = [ "Rect", "texture_under" ]
 
 [node name="Railcast" type="RayCast2D" parent="."]
 enabled = true
@@ -141,5 +135,4 @@ cast_to = Vector2( 1000, 0 )
 collision_mask = 2
 collide_with_areas = true
 collide_with_bodies = true
-_sections_unfolded = [ "Collide With" ]
 
