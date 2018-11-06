@@ -72,6 +72,11 @@ func pursuit():
 	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
 	return seek(target.position + target.velocity * look_ahead_time)
 
+func evade():
+	var to_target = target.position - position
+	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
+	return flee(target.position + target.velocity * look_ahead_time)
+
 const MIN_DETECTION_BOX_LENGTH = 200
 const BRAKING_WEIGHT = 0.2
 
@@ -161,7 +166,7 @@ func hide():
 			best_hiding_spot = hiding_spot
 
 	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
-	else: return Vector2()#evade()
+	else: return evade()
 
 
 func _draw():
