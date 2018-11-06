@@ -2,36 +2,23 @@ extends Area2D
 
 onready var target = get_tree().get_nodes_in_group("player")[0]
 
-var max_speed
-var speed
-var velocity = Vector2(0,0) # current velocity, works as 'self heading' for now too
-var desired_velocity
-var to_target = Vector2(0,0)
-var to_target_heading = Vector2(0,0)
+const MAX_SPEED = 130
+const RADIUS = 32
+
+var velocity = Vector2(0,0)
 var is_damaging = -100
-const radius = 32 # 
 
 func _ready():
-	speed = 0
-	max_speed = 130
 	rotation = randf() * PI*2
 	
 	var theta = randf() * 2*PI
 	wander_target = Vector2(WANDER_RADIUS * cos(theta), WANDER_RADIUS * sin(theta))
 
 func _process(delta):
-	to_target = target.position - position
-	to_target_heading = to_target + target.velocity
-	#velocity += seek(target.position)
-	#velocity += flee(target.position)
-	#velocity += arrive(target.position, 2)
-	velocity = (velocity + wander()).clamped(max_speed)
-	velocity += pursuit(target.position)
-	speed = velocity.length()
-#	velocity += obstacle_avoidance(get_tree().get_nodes_in_group("obstacles"))
-	position += declip()
-	speed = velocity.length()
+	velocity = (velocity + next_step()).clamped(MAX_SPEED)
+	
 	position += velocity * delta
+	position += declip()
 	rotation = velocity.angle()
 	
 	if is_damaging >= 0:
@@ -42,57 +29,62 @@ func _process(delta):
 	
 	update()
 
+func next_step():
+	return wander()
+
 func seek(target_position):
-	desired_velocity = (target_position - position).normalized() * max_speed
+	var desired_velocity = (target_position - position).normalized() * MAX_SPEED
 	return desired_velocity - velocity
 
-func flee(target_position): 
-	var panic_distance_sq = 300.0 * 300.0;
-	if vec_to_distance_sq(self.position, target_position) > panic_distance_sq:
+const PANIC_DISTANCE_SQ = pow(300, 2)
+
+func flee(target_position):
+	if vec_to_distance_sq(position, target_position) > PANIC_DISTANCE_SQ:
 		return Vector2(0,0)
 	
-	desired_velocity = (position - target_position).normalized() * max_speed
-	
+	var desired_velocity = (position - target_position).normalized() * MAX_SPEED
 	return desired_velocity - velocity
 
 func arrive(target_position, deceleration):
+	var to_target = target_position - position
 	var dist = to_target.length()
+	
 	if dist > 0:
 		var deceleration_tweaker = 0.3
 		var speed = dist / deceleration * deceleration_tweaker
 		
-		speed = clamp(speed, 0, max_speed)
-		desired_velocity = to_target * speed / dist
+		speed = clamp(speed, 0, MAX_SPEED)
+		var desired_velocity = to_target * speed / dist
 		
 		return desired_velocity - velocity
 	return Vector2(0,0)
 
 func pursuit(target_position):
 	var relative_heading = velocity.dot(target.velocity)
+	var to_target = target_position - position
 	
 	if to_target.dot(velocity) > 0 and relative_heading < -0.95: return seek(target_position)
 	
-	var look_ahead_time = to_target.length() / (max_speed + target.speed)
+	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
 	return seek(target_position + target.velocity * look_ahead_time)
 
 const MIN_DETECTION_BOX_LENGTH = 200
 const BRAKING_WEIGHT = 0.2
 
-#var avoided
-
 func obstacle_avoidance(obstacles):
-	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/max_speed) * MIN_DETECTION_BOX_LENGTH
+	var speed = 100 #TODO
+	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/MAX_SPEED) * MIN_DETECTION_BOX_LENGTH
 	
 	var dist_to_closest_ip = INF
 	var closest_intersecting_obstacle
 	var local_pos_of_closest_obstacle = Vector2()
 	
 	for obstacle in obstacles:
-		if (obstacle.global_position - global_position).length_squared() < detection_box_length * detection_box_length:
-			var local_pos = (obstacle.global_position - global_position).rotated(-rotation)
+		if (obstacle.position - position).length_squared() < detection_box_length * detection_box_length:
+			var local_pos = (obstacle.position - position).rotated(-rotation)
 			
 			if local_pos.x >= 0:
-				var expanded_radius = obstacle.radius + radius
+				var expanded_radius = obstacle.radius + RADIUS
 				
 				if abs(local_pos.y) < expanded_radius:
 					var cX = local_pos.x
@@ -124,13 +116,13 @@ func obstacle_avoidance(obstacles):
 
 func declip():
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
-		if (obstacle.position - position).length() < obstacle.radius + radius:
-			return -(obstacle.position - position).normalized() * ((obstacle.radius + radius) - (obstacle.position - position).length())
+		if (obstacle.position - position).length() < obstacle.radius + RADIUS:
+			return -(obstacle.position - position).normalized() * ((obstacle.radius + RADIUS) - (obstacle.position - position).length())
 	
 	for monster in get_tree().get_nodes_in_group("monsters"):
-		if monster != self and (monster.position - position).length() < monster.radius + radius:
-			monster.position += (monster.position - position).normalized() * ((monster.radius + radius) - (monster.position - position).length())
-			return -(monster.position - position).normalized() * ((monster.radius + radius) - (monster.position - position).length())
+		if monster != self and (monster.position - position).length() < monster.RADIUS + RADIUS:
+			monster.position += (monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
+			return -(monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
 	return Vector2()
 
 const WANDER_RADIUS = 16
@@ -149,27 +141,30 @@ const DISTANCE_FROM_BOUNDARY = 30
 
 func get_hiding_position(obstacle):
 	var dist_away = obstacle.radius + DISTANCE_FROM_BOUNDARY
-	var towards_obstacle = (obstacle.global_position - target.global_position).normalized()
-	return towards_obstacle * dist_away + obstacle.global_position
+	var towards_obstacle = (obstacle.position - target.position).normalized()
+	return towards_obstacle * dist_away + obstacle.position
 
 func hide():
 	var dist_to_closest = INF
-	var best_hiding_spot = Vector2()
+	var best_hiding_spot
 	
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
-		
 		var hiding_spot = get_hiding_position(obstacle)
+		var dist = (hiding_spot - position).length_squared()
 		
-		var dist #TODO 132pdf/109book
+		if dist < dist_to_closest:
+			dist_to_closest = dist
+			best_hiding_spot = best_hiding_spot
 
-
+	if best_hiding_spot: return arrive(best_hiding_spot, 1)
+	else: return Vector2()#evade()
 
 
 func _draw():
 	if Input.is_key_pressed(KEY_CONTROL):
 		draw_set_transform(Vector2(), -rotation, Vector2(1, 1))
-		draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.3), 5)  # blue
-		draw_vector(Vector2(0,0), to_target, Color(0, 1, 0, 0.3), 5)  # green
+		draw_vector(Vector2(0,0), target.position - position, Color(0, 1, 0, 0.3), 5)  # green
+#		draw_vector(Vector2(0,0), to_target_heading, Color(0, 0, 1, 0.3), 5)  # blue
 		draw_vector(Vector2(0,0), velocity, Color(1, 0, 0, 0.4), 5)  # red
 
 func draw_vector( origin, vector, color, arrow_size ):

@@ -34,7 +34,6 @@ texture = ExtResource( 1 )
 centered = false
 region_enabled = true
 region_rect = Rect2( 0, 0, 3000, 3000 )
-_sections_unfolded = [ "Offset", "Region", "Transform", "Z Index" ]
 
 [node name="MapBoundary" type="StaticBody2D" parent="."]
 editor/display_folded = true
@@ -43,26 +42,20 @@ collision_layer = 1
 collision_mask = 1
 constant_linear_velocity = Vector2( 0, 0 )
 constant_angular_velocity = 0.0
-physics_material_override = null
 script = ExtResource( 2 )
-_sections_unfolded = [ "Collision" ]
 bounds = Rect2( 0, 0, 3000, 3000 )
 
 [node name="Edge" type="CollisionShape2D" parent="MapBoundary"]
 shape = SubResource( 1 )
-_sections_unfolded = [ "shape" ]
 
 [node name="Edge2" type="CollisionShape2D" parent="MapBoundary"]
 shape = SubResource( 2 )
-_sections_unfolded = [ "shape" ]
 
 [node name="Edge3" type="CollisionShape2D" parent="MapBoundary"]
 shape = SubResource( 3 )
-_sections_unfolded = [ "shape" ]
 
 [node name="Edge4" type="CollisionShape2D" parent="MapBoundary"]
 shape = SubResource( 4 )
-_sections_unfolded = [ "shape" ]
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
 position = Vector2( 578, 279 )
@@ -73,11 +66,9 @@ rotation_speed = 2.5
 
 [node name="Obstacle" parent="Obstacles" instance=ExtResource( 4 )]
 position = Vector2( 1066.34, 507.801 )
-_sections_unfolded = [ "Collision", "Material" ]
 
 [node name="Monsters" type="Node2D" parent="."]
 
 [node name="Monster" parent="Monsters" instance=ExtResource( 5 )]
 position = Vector2( 701.32, 537.48 )
-_sections_unfolded = [ "Collision", "Transform" ]
 
