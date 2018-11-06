@@ -70,5 +70,5 @@ position = Vector2( 1066.34, 507.801 )
 [node name="Monsters" type="Node2D" parent="."]
 
 [node name="Monster" parent="Monsters" instance=ExtResource( 5 )]
-position = Vector2( 701.32, 537.48 )
+position = Vector2( 111.078, 626.334 )
 

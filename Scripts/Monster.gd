@@ -1,6 +1,7 @@
 extends Area2D
 
 onready var target = get_tree().get_nodes_in_group("player")[0]
+onready var bounds = $"../../MapBoundary".bounds
 
 const MAX_SPEED = 300
 const RADIUS = 32
@@ -32,7 +33,7 @@ func _process(delta):
 	update()
 
 func next_step():
-	return flock() + obstacle_avoidance()
+	return flock() + obstacle_avoidance() + wall_avoidance()
 	return hide() + obstacle_avoidance()
 	return wander()
 
@@ -125,6 +126,36 @@ func obstacle_avoidance():
 #		avoided = false
 	
 	return steering_force.rotated(rotation)
+
+func wall_avoidance():
+	var feelers = [$Feelers/LeftFeeler.global_position, $Feelers/RightFeeler.global_position]
+	var steering_force = Vector2()
+	
+	for feeler in feelers:
+		var feeler_position = (feeler - global_position).normalized()
+		
+		if feeler.x < bounds.position.x:
+#			var inside = (feeler - get_intersection_point(bounds.position,
+#				bounds.position + Vector2(0, bounds.size.y), position, feeler)).length()
+			steering_force += feeler_position.reflect(Vector2.UP) * -feeler.x
+		
+		elif feeler.x > bounds.position.x + bounds.size.x:
+#			var inside = (feeler - get_intersection_point(bounds.position + Vector2(bounds.size.x, 0),
+#				bounds.position + bounds.size, position, feeler)).length()
+			steering_force += feeler_position.reflect(Vector2.UP) * feeler.x
+		
+		elif feeler.y < bounds.position.y:
+#			var inside = (feeler - get_intersection_point(bounds.position,
+#				bounds.position + Vector2(bounds.size.x, 0), position, feeler)).length()
+			steering_force += feeler_position.reflect(Vector2.RIGHT) * -feeler.y
+		
+		elif feeler.y > bounds.position.y + bounds.size.y:
+#			var inside = (feeler - get_intersection_point(bounds.position + Vector2(0, bounds.size.y),
+#				bounds.position + bounds.size, position, feeler)).length()
+			steering_force += feeler_position.reflect(Vector2.RIGHT) * feeler.y
+	
+#	print(steering_force)
+	return steering_force
 
 func declip():
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
@@ -245,3 +276,21 @@ func on_collision(body):
 func on_decolission(body):
 	if body.is_in_group("player"):
 		is_damaging = -100
+
+#func get_intersection_point(A, B, C, D):
+#	var r_top = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y)
+#	var r_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x)
+#
+#	var s_top = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y)
+#	var s_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x)
+#
+#	if r_bot == 0 or s_bot == 0:
+#		return Vector2()
+#
+#	var r = r_top - r_bot
+#	var s = s_top - s_bot
+#	if r > 0 and r < 1 and s > 0 and s < 1:
+#		var dist = (A - B).length() * r
+#		return A + r * (B - A)
+#
+#	return Vector2()
