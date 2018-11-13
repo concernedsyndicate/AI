@@ -65,5 +65,5 @@ func _input(event):
 		bullet.rotation = rotation
 		
 		if ray.is_colliding():
-			if ray.get_collider().is_in_group("monsters"): ray.get_collider().queue_free()
+			if ray.get_collider().is_in_group("monsters"): ray.get_collider().kill()
 			bullet.line.points[1].x = (global_position - ray.get_collision_point()).length()
