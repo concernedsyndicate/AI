@@ -21,7 +21,7 @@ func _process(delta):
 	velocity = (velocity + next_step()).clamped(MAX_SPEED)
 	
 	position += velocity * delta
-	position += declip()
+	call_deferred("declip")
 	rotation = velocity.angle()
 	
 	if is_damaging >= 0:
@@ -158,15 +158,18 @@ func wall_avoidance():
 	return steering_force
 
 func declip():
+	var move = Vector2()
+	
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
-		if (obstacle.position - position).length() < obstacle.radius + RADIUS:
-			return -(obstacle.position - position).normalized() * ((obstacle.radius + RADIUS) - (obstacle.position - position).length())
+		if (obstacle.position - position).length() <= obstacle.radius + RADIUS:
+			move -= (obstacle.position - position).normalized() * ((obstacle.radius + RADIUS) - (obstacle.position - position).length())
 	
 	for monster in get_tree().get_nodes_in_group("monsters"):
-		if monster != self and (monster.position - position).length() < monster.RADIUS + RADIUS:
-			monster.position += (monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
-			return -(monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
-	return Vector2()
+		if monster != self and (monster.position - position).length() <= monster.RADIUS + RADIUS:
+#			monster.position += (monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
+			move -= (monster.position - position).normalized() * ((monster.RADIUS + RADIUS) - (monster.position - position).length())
+	
+	position += move
 
 const WANDER_RADIUS = 16
 const WANDER_DISTANCE = 256
@@ -247,7 +250,7 @@ func cohesion():
 func flock():
 	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
-	if neighbors.size() > 2:
+	if neighbors.size() >= 2:
 		steering_force += seek(target.position)
 	else:
 		steering_force += wander() + hide()
