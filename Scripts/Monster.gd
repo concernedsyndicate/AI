@@ -34,8 +34,8 @@ func _process(delta):
 
 func next_step():
 	return flock() + obstacle_avoidance() + wall_avoidance()
-	return hide() + obstacle_avoidance()
-	return wander()
+#	return hide() + obstacle_avoidance()
+#	return wander()
 
 func seek(target_position):
 	var desired_velocity = (target_position - position).normalized() * MAX_SPEED
@@ -247,13 +247,18 @@ func cohesion():
 	
 	return Vector2()
 
+const FLEE_DIST = 200
+
 func flock():
 	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
 	if neighbors.size() >= 2:
 		steering_force += seek(target.position)
 	else:
-		steering_force += wander() + hide()
+		if (target.position - position).length() > FLEE_DIST:
+			steering_force += wander() + hide()
+		else:
+			steering_force += wander() + hide() + flee(target.position)
 	
 	return steering_force
 
