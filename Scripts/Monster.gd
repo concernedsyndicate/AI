@@ -287,20 +287,7 @@ func on_decolission(body):
 	if body.is_in_group("player"):
 		is_damaging = -100
 
-#func get_intersection_point(A, B, C, D):
-#	var r_top = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y)
-#	var r_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x)
-#
-#	var s_top = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y)
-#	var s_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x)
-#
-#	if r_bot == 0 or s_bot == 0:
-#		return Vector2()
-#
-#	var r = r_top - r_bot
-#	var s = s_top - s_bot
-#	if r > 0 and r < 1 and s > 0 and s < 1:
-#		var dist = (A - B).length() * r
-#		return A + r * (B - A)
-#
-#	return Vector2()
+func kill():
+	queue_free()
+	if get_parent().get_child_count() == 1:
+		$"../../UI".win()
