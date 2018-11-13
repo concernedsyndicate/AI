@@ -1,6 +1,10 @@
 extends KinematicBody2D
 
 onready var ray = $Railcast
+onready var camera = $Camera2D
+
+var target_camera = Vector2()
+var target_zoom = Vector2(1, 1)
 
 const RAIL_COOLDOWN = 1.5
 
@@ -16,6 +20,7 @@ var rotation_dir = 0
 func _process(delta):
 	process_move(delta)
 	process_attack(delta)
+	process_camera(delta)
 	$UI.rotation = -rotation
 
 func process_move(delta):
@@ -29,6 +34,14 @@ func process_move(delta):
 func process_attack(delta):
 	cooldown -= delta
 	$Sprite.modulate.b = 1 - clamp(cooldown, 0, RAIL_COOLDOWN) / RAIL_COOLDOWN
+
+func process_camera(delta):
+	target_camera = (get_local_mouse_position()/camera.zoom/5).clamped(400)
+	var dist = clamp(camera.position.length()/70, 1, 1.3)
+	target_zoom = Vector2(dist, dist)
+	
+	camera.position += (target_camera - camera.position) * delta
+	camera.zoom += (target_zoom - camera.zoom) * delta
 
 func _draw():
 	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(0, 0.5, 1, 0.4), 5)
