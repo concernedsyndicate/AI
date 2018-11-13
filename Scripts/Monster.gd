@@ -245,12 +245,14 @@ func cohesion():
 	return Vector2()
 
 func flock():
-	var steering_force = separation() * 10 + alignment() + cohesion()
+	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
-	if steering_force != Vector2():
-		return steering_force
+	if neighbors.size() > 2:
+		steering_force += seek(target.position)
 	else:
-		return wander()
+		steering_force += wander() + hide()
+	
+	return steering_force
 
 func _draw():
 	if Input.is_key_pressed(KEY_CONTROL):
