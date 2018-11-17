@@ -45,7 +45,6 @@ func process_camera(delta):
 	camera.position += (target_camera - camera.position) * delta
 	camera.zoom += (target_zoom - camera.zoom) * delta
 	
-	print(global_position, ray.get_collision_point())
 	var length = (global_position - ray.get_collision_point()).length()
 	sight.region_rect.position.x -= 1
 	sight.region_rect.size.x = length
