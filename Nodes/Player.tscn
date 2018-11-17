@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scripts/Player.gd" type="Script" id=1]
 [ext_resource path="res://Sprites/Player.png" type="Texture" id=2]
+[ext_resource path="res://Sprites/LaserSight.png" type="Texture" id=3]
 
 [sub_resource type="Gradient" id=1]
 
@@ -70,7 +71,7 @@ editor_draw_limits = false
 editor_draw_drag_margin = false
 
 [node name="UI" type="Node2D" parent="."]
-editor/display_folded = true
+z_index = 100
 
 [node name="Health" type="Label" parent="UI"]
 editor/display_folded = true
@@ -132,8 +133,14 @@ nine_patch_stretch = false
 [node name="Railcast" type="RayCast2D" parent="."]
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 1000, 0 )
+cast_to = Vector2( 10000, 0 )
 collision_mask = 2
 collide_with_areas = true
 collide_with_bodies = true
+
+[node name="Laser" type="Sprite" parent="."]
+z_index = -1
+texture = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 10, 2 )
 

@@ -1,6 +1,7 @@
 extends KinematicBody2D
 
 onready var ray = $Railcast
+onready var sight = $Laser
 onready var camera = $Camera2D
 
 var target_camera = Vector2()
@@ -33,7 +34,8 @@ func process_move(delta):
 
 func process_attack(delta):
 	cooldown -= delta
-	$Sprite.modulate.b = 1 - clamp(cooldown, 0, RAIL_COOLDOWN) / RAIL_COOLDOWN
+	$Sprite.modulate.r = 1 - clamp(cooldown, 0, RAIL_COOLDOWN) / RAIL_COOLDOWN
+	$Sprite.modulate.g = $Sprite.modulate.r
 
 func process_camera(delta):
 	target_camera = (get_local_mouse_position()/camera.zoom/5).clamped(400)
@@ -42,10 +44,12 @@ func process_camera(delta):
 	
 	camera.position += (target_camera - camera.position) * delta
 	camera.zoom += (target_zoom - camera.zoom) * delta
-
-func _draw():
-	draw_line(Vector2(0,0), Vector2(speed, 0).rotated(rotation), Color(0, 0.5, 1, 0.4), 5)
-	# dlaczego nie jest w stanie rysowac dla 'velocity' ? //bo musisz robić update() //dzięki, teraz tylko wykminić dlaczego źle rysuje wtedy
+	
+	print(global_position, ray.get_collision_point())
+	var length = (global_position - ray.get_collision_point()).length()
+	sight.region_rect.position.x -= 1
+	sight.region_rect.size.x = length
+	sight.position.x = length/2
 
 func set_health(h):
 	health = h
