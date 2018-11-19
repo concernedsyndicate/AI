@@ -9,6 +9,7 @@ const RADIUS = 32
 var velocity = Vector2(0,0)
 var neighbors = []
 var is_damaging = -100
+var flocked_before = false
 
 func _ready():
 	rotation = randf() * PI*2
@@ -205,7 +206,7 @@ func hide():
 	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
 	else: return evade()
 
-const NEIGHBOR_RANGE_SQ = pow(400, 2)
+const NEIGHBOR_RANGE_SQ = pow(330, 2)
 
 func update_neighbor_list():
 	neighbors.clear()
@@ -252,7 +253,8 @@ const FLEE_DIST = 200
 func flock():
 	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
-	if neighbors.size() >= 2:
+	if neighbors.size() >= 2 or flocked_before:
+		flocked_before = true
 		steering_force += seek(target.position)
 	else:
 		if (target.position - position).length() > FLEE_DIST:
