@@ -12,6 +12,7 @@ var velocity = Vector2(0,0)
 var neighbors = []
 var is_damaging = false
 var flocked_before = false
+var current_obstacle = {}
 
 func _ready():
 	rotation = randf() * PI*2
@@ -34,7 +35,7 @@ func _process(delta):
 
 func next_step(delta):
 	return flock(delta) + obstacle_avoidance() + wall_avoidance()
-#	return hide() + obstacle_avoidance()
+#	return _hide() + obstacle_avoidance()
 #	return wander()
 
 func seek(target_position):
@@ -190,7 +191,10 @@ func get_hiding_position(obstacle):
 	var towards_obstacle = (obstacle.position - target.position).normalized()
 	return towards_obstacle * dist_away + obstacle.position
 
-func hide():
+const MAX_HIDING = 3
+const MAX_OBSTACLES_AVOIDED = 2
+
+func _hide(delta):
 	var dist_to_closest = INF
 	var best_hiding_spot
 	
@@ -202,7 +206,14 @@ func hide():
 			dist_to_closest = dist
 			best_hiding_spot = hiding_spot
 
-	if best_hiding_spot: return arrive(best_hiding_spot, FAST)
+	if best_hiding_spot and (!current_obstacle.has(best_hiding_spot) or current_obstacle[best_hiding_spot] < MAX_HIDING):
+		if current_obstacle.empty() or best_hiding_spot != current_obstacle.keys()[0]:
+			if current_obstacle.size() >= MAX_OBSTACLES_AVOIDED: current_obstacle.clear()
+			current_obstacle[best_hiding_spot] = 0
+		else:
+			current_obstacle[best_hiding_spot] += delta
+		
+		return arrive(best_hiding_spot, FAST)
 	else: return evade()
 
 const NEIGHBOR_RANGE_SQ = pow(330, 2)
@@ -261,9 +272,9 @@ func flock(delta):
 		steering_force += seek(target.position)
 	else:
 		if (target.position - position).length() > FLEE_DIST:
-			steering_force += wander() + hide()
+			steering_force += wander() + _hide(delta)
 		else:
-			steering_force += wander() + hide() + flee(target.position)
+			steering_force += wander() + _hide(delta) + flee(target.position)
 		
 		risk_timer += delta
 		if risk_timer > RISK_THRESHOLD:
