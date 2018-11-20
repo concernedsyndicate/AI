@@ -5,10 +5,11 @@ onready var bounds = $"../../MapBoundary".bounds
 
 const MAX_SPEED = 300
 const RADIUS = 32
+const DAMAGE_RATE = 1
 
 var velocity = Vector2(0,0)
 var neighbors = []
-var is_damaging = -100
+var is_damaging = -DAMAGE_RATE
 var flocked_before = false
 
 func _ready():
@@ -27,7 +28,7 @@ func _process(delta):
 	
 	if is_damaging >= 0:
 		is_damaging -= delta
-	elif is_damaging > -100:
+	elif is_damaging > -DAMAGE_RATE:
 		is_damaging = 1
 		target.health -= 1
 	
@@ -287,7 +288,7 @@ func on_collision(body):
 
 func on_decolission(body):
 	if body.is_in_group("player"):
-		is_damaging = -100
+		is_damaging = -DAMAGE_RATE
 
 func kill():
 	queue_free()

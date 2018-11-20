@@ -8,7 +8,7 @@ script/source = "extends ColorRect
 
 func _input(event):
 	if event is InputEventKey:
-		get_tree().change_scene(\"res://MainScene.tscn\")"
+		get_tree().change_scene(\"res://Scenes/MainScene.tscn\")"
 
 [node name="GameOver" type="ColorRect"]
 anchor_left = 0.0
@@ -43,5 +43,4 @@ valign = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_colors", "custom_fonts", "custom_fonts/font" ]
 
