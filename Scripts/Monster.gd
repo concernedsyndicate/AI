@@ -4,12 +4,13 @@ onready var target = get_tree().get_nodes_in_group("player")[0]
 onready var bounds = $"../../MapBoundary".bounds
 
 const MAX_SPEED = 300
+const CHASING_SPEED = 359
 const RADIUS = 32
-const DAMAGE_RATE = 1
+const DAMAGE_RATE = 0.3
 
 var velocity = Vector2(0,0)
 var neighbors = []
-var is_damaging = -DAMAGE_RATE
+var is_damaging = false
 var flocked_before = false
 
 func _ready():
@@ -20,16 +21,13 @@ func _ready():
 
 func _process(delta):
 	update_neighbor_list()
-	velocity = (velocity + next_step(delta)).clamped(MAX_SPEED)
+	velocity = (velocity + next_step(delta)).clamped(max_speed())
 	
 	position += velocity * delta
 	call_deferred("declip")
 	rotation = velocity.angle()
 	
-	if is_damaging >= 0:
-		is_damaging -= delta
-	elif is_damaging > -DAMAGE_RATE:
-		is_damaging = 1
+	if is_damaging:
 		target.health -= 1
 	
 	update()
@@ -40,7 +38,7 @@ func next_step(delta):
 #	return wander()
 
 func seek(target_position):
-	var desired_velocity = (target_position - position).normalized() * MAX_SPEED
+	var desired_velocity = (target_position - position).normalized() * max_speed()
 	return desired_velocity - velocity
 
 const PANIC_DISTANCE_SQ = pow(300, 2)
@@ -49,7 +47,7 @@ func flee(target_position):
 	if (target_position - position).length_squared() > PANIC_DISTANCE_SQ:
 		return Vector2(0,0)
 	
-	var desired_velocity = (position - target_position).normalized() * MAX_SPEED
+	var desired_velocity = (position - target_position).normalized() * max_speed()
 	return desired_velocity - velocity
 
 enum Deceleration{SLOW = 3, NORMAL = 2, FAST = 1}
@@ -61,7 +59,7 @@ func arrive(target_position, deceleration):
 	
 	if dist > 0:
 		var speed = dist / deceleration * DECELERATION_TWEAKER
-		speed = clamp(speed, 0, MAX_SPEED)
+		speed = clamp(speed, 0, max_speed())
 		
 		var desired_velocity = to_target * speed / dist
 		return desired_velocity - velocity
@@ -75,12 +73,12 @@ func pursuit():
 	
 	if to_target.dot(heading) > 0 and relative_heading < -0.95: return seek(target.position)
 	
-	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
+	var look_ahead_time = to_target.length() / (max_speed() + target.speed)
 	return seek(target.position + target.velocity * look_ahead_time)
 
 func evade():
 	var to_target = target.position - position
-	var look_ahead_time = to_target.length() / (MAX_SPEED + target.speed)
+	var look_ahead_time = to_target.length() / (max_speed() + target.speed)
 	return flee(target.position + target.velocity * look_ahead_time)
 
 const MIN_DETECTION_BOX_LENGTH = 200
@@ -88,7 +86,7 @@ const BRAKING_WEIGHT = 0.2
 
 func obstacle_avoidance():
 	var speed = 100 #TODO
-	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/MAX_SPEED) * MIN_DETECTION_BOX_LENGTH
+	var detection_box_length = MIN_DETECTION_BOX_LENGTH + (speed/max_speed()) * MIN_DETECTION_BOX_LENGTH
 	
 	var dist_to_closest_ip = INF
 	var closest_intersecting_obstacle
@@ -258,7 +256,7 @@ var risk_timer = 0
 func flock(delta):
 	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
-	if neighbors.size() >= 2 or flocked_before:
+	if neighbors.size() >= 2 or flocked_before or (!neighbors.empty() and neighbors[0].flocked_before):
 		flocked_before = true
 		steering_force += seek(target.position)
 	else:
@@ -294,13 +292,16 @@ func draw_vector( origin, vector, color, arrow_size ):
 
 func on_collision(body):
 	if body.is_in_group("player"):
-		is_damaging = 0
+		is_damaging = true
 
 func on_decolission(body):
 	if body.is_in_group("player"):
-		is_damaging = -DAMAGE_RATE
+		is_damaging = false
 
 func kill():
 	queue_free()
 	if get_parent().get_child_count() == 1:
 		$"../../UI".win()
+
+func max_speed():
+	return CHASING_SPEED if flocked_before else MAX_SPEED
