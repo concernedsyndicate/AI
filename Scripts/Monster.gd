@@ -20,7 +20,7 @@ func _ready():
 
 func _process(delta):
 	update_neighbor_list()
-	velocity = (velocity + next_step()).clamped(MAX_SPEED)
+	velocity = (velocity + next_step(delta)).clamped(MAX_SPEED)
 	
 	position += velocity * delta
 	call_deferred("declip")
@@ -34,8 +34,8 @@ func _process(delta):
 	
 	update()
 
-func next_step():
-	return flock() + obstacle_avoidance() + wall_avoidance()
+func next_step(delta):
+	return flock(delta) + obstacle_avoidance() + wall_avoidance()
 #	return hide() + obstacle_avoidance()
 #	return wander()
 
@@ -250,8 +250,12 @@ func cohesion():
 	return Vector2()
 
 const FLEE_DIST = 200
+const RISK_THRESHOLD = 3
+const RISK_MAX = 4
 
-func flock():
+var risk_timer = 0
+
+func flock(delta):
 	var steering_force = separation() * 2000 + alignment() + cohesion() * 0.1
 	
 	if neighbors.size() >= 2 or flocked_before:
@@ -262,7 +266,13 @@ func flock():
 			steering_force += wander() + hide()
 		else:
 			steering_force += wander() + hide() + flee(target.position)
-	
+		
+		risk_timer += delta
+		if risk_timer > RISK_THRESHOLD:
+			steering_force += wander()*2
+			
+			if risk_timer > RISK_MAX:
+				risk_timer = 0
 	return steering_force
 
 func _draw():
